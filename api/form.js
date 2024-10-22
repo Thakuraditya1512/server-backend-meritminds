@@ -1,27 +1,28 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const cors = require('cors'); // Import cors
+const cors = require('cors'); // Import CORS package
 require('dotenv').config(); // Load environment variables
 
 const app = express();
 
-// Use CORS middleware
-app.use(cors());  // This enables CORS for all requests from all origins
+// Use CORS middleware to allow all origins
+app.use(cors());  // Enable CORS for all incoming requests
 
-// If you only want to allow specific origins, use this instead:
-// app.use(cors({
-//     origin: 'http://127.0.0.1:5500'  // Allows requests only from your local development URL
-// }));
+// Optionally, restrict CORS to specific origin (for local testing):
+// app.use(cors({ origin: 'http://127.0.0.1:5500' }));
 
-app.use(bodyParser.json()); // Middleware to parse JSON requests
+app.use(bodyParser.json()); // Middleware to parse incoming JSON
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB Atlas'))
-  .catch(err => console.log('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('Connected to MongoDB Atlas'))
+.catch(err => console.log('MongoDB connection error:', err));
 
-// Define the form schema
+// Define form schema
 const formSchema = new mongoose.Schema({
   name: String,
   email: String,
@@ -40,7 +41,6 @@ app.post('/api/form', async (req, res) => {
     return res.status(400).json({ error: 'Name, email, and message are required.' });
   }
 
-  // Save form data to MongoDB
   const newForm = new Form({ name, email, subject, message });
 
   try {
