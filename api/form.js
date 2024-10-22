@@ -19,6 +19,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 const formSchema = new mongoose.Schema({
   name: String,
   email: String,
+  subject: String, // Add this line
   message: String
 });
 
@@ -26,16 +27,14 @@ const Form = mongoose.model('Form', formSchema);
 
 // Handle form submissions
 app.post('/api/form', async (req, res) => {
-  const { name, email, message } = req.body;
+    const { name, email, subject, message } = req.body; // Add subject here
 
-  const newForm = new Form({ name, email, message });
+    const newForm = new Form({ name, email, subject, message }); // Include subject
 
-  try {
-    await newForm.save();
-    res.status(201).send('Form data saved successfully');
-  } catch (error) {
-    res.status(400).send('Error saving form data');
-  }
+    try {
+        await newForm.save();
+        res.status(201).send('Form data saved successfully');
+    } catch (error) {
+        res.status(400).send('Error saving form data');
+    }
 });
-
-module.exports = app;
