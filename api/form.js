@@ -1,17 +1,22 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const cors = require('cors');
-require('dotenv').config(); // Load environment variables from .env
+const cors = require('cors'); // Import cors
+require('dotenv').config(); // Load environment variables
 
 const app = express();
-app.use(cors({ origin: 'http://127.0.0.1:5500' }));
-app.use(bodyParser.json());
 
+// Use CORS middleware
+app.use(cors());  // This enables CORS for all requests from all origins
 
+// If you only want to allow specific origins, use this instead:
+// app.use(cors({
+//     origin: 'http://127.0.0.1:5500'  // Allows requests only from your local development URL
+// }));
 
+app.use(bodyParser.json()); // Middleware to parse JSON requests
 
-// MongoDB Atlas connection
+// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.log('MongoDB connection error:', err));
@@ -35,6 +40,7 @@ app.post('/api/form', async (req, res) => {
     return res.status(400).json({ error: 'Name, email, and message are required.' });
   }
 
+  // Save form data to MongoDB
   const newForm = new Form({ name, email, subject, message });
 
   try {
@@ -46,5 +52,5 @@ app.post('/api/form', async (req, res) => {
   }
 });
 
-// Export the app so Vercel can use it as a serverless function
+// Export the app so Vercel can handle it as a serverless function
 module.exports = app;
